@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class AdvancedGameState {
+    // TODO: maybe use BiMap from Guava to make search easier
     private final Map<GameState.Position, Mine> mines;
     private final Map<GameState.Position, Pub> pubs;
     private final Map<GameState.Position, GameState.Hero> heroesByPosition;

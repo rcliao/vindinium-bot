@@ -18,6 +18,8 @@ import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.stream.IntStream;
+
 /**
  * CLI program for launching a bot
  */
@@ -34,6 +36,7 @@ public class Main {
         final String arena = args[1];
         final String botType = args[2];
         final String botClass = args[3];
+        final Integer numberOfRuns = Integer.parseInt(args[4]);
 
         final GenericUrl gameUrl;
 
@@ -50,20 +53,35 @@ public class Main {
                 runSimpleBot(key, gameUrl, botClass);
                 break;
             case "advanced":
-                runAdvancedBot(key, gameUrl, botClass);
+                runAdvancedBot(key, gameUrl, botClass, numberOfRuns);
                 break;
             default:
                 throw new RuntimeException("The bot type must be simple or advanced and must match the type of the bot.");
         }
     }
 
-    private static void runAdvancedBot(String key, GenericUrl gameUrl, String botClass) throws Exception {
+    private static void runAdvancedBot(String key, GenericUrl gameUrl, String botClass, Integer numberOfRuns) throws Exception {
         Class<?> clazz = Class.forName(botClass);
         Class<? extends AdvancedBot> botClazz = clazz.asSubclass(AdvancedBot.class);
         AdvancedBot bot = botClazz.newInstance();
         ApiKey apiKey = new ApiKey(key);
         AdvancedBotRunner runner = new AdvancedBotRunner(apiKey, gameUrl, bot);
-        runner.call();
+
+        if (numberOfRuns == -1) {
+            while (true) {
+                runner.call();
+                Thread.sleep(500);
+            }
+        } else {
+            IntStream.range(0, numberOfRuns)
+                .forEach(i -> {
+                    try {
+                        runner.call();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+        }
     }
     private static void runSimpleBot(String key, GenericUrl gameUrl, String botClass) throws Exception {
         Class<?> clazz = Class.forName(botClass);

@@ -69,7 +69,7 @@ public class AdvancedMurderBot implements AdvancedBot {
         while(!queue.isEmpty()) {
             GameState.Position currentPosition = queue.poll();
             DijkstraResult currentResult = result.get(currentPosition);
-            Vertex currentVertext = gameState.getBoardGraph().get(currentPosition);
+            Vertex currentVertex = gameState.getBoardGraph().get(currentPosition);
 
             // If there's a bot here, then this vertex goes nowhere
             if(gameState.getHeroesByPosition().containsKey(currentPosition)
@@ -78,7 +78,7 @@ public class AdvancedMurderBot implements AdvancedBot {
 
             int distance = currentResult.getDistance() + 1;
 
-            for(Vertex neighbor : currentVertext.getAdjacentVertices()) {
+            for(Vertex neighbor : currentVertex.getAdjacentVertices()) {
                 DijkstraResult neighborResult = result.get(neighbor.getPosition());
                 if(neighborResult == null) {
                     neighborResult = new DijkstraResult(distance, currentPosition);
@@ -105,16 +105,15 @@ public class AdvancedMurderBot implements AdvancedBot {
         SquatDecisioner squatDecisioner = new SquatDecisioner();
         UnattendedMineDecisioner unattendedMineDecisioner = new UnattendedMineDecisioner(squatDecisioner);
         BotTargetingDecisioner botTargetingDecisioner = new BotTargetingDecisioner(unattendedMineDecisioner);
-        EnRouteLootingDecisioner enRouteLootingDecisioner = new EnRouteLootingDecisioner(botTargetingDecisioner);
+        EnRouteLootingDecisioner enRouteLootingDecisioner = new EnRouteLootingDecisioner(unattendedMineDecisioner);
 
         HealDecisioner healDecisioner = new HealDecisioner();
         CombatOutcomeDecisioner combatOutcomeDecisioner = new CombatOutcomeDecisioner(botTargetingDecisioner,
                 botTargetingDecisioner);
         CombatEngagementDecisioner combatEngagementDecisioner = new CombatEngagementDecisioner(combatOutcomeDecisioner,
                 healDecisioner);
-        BotWellnessDecisioner botWellnessDecisioner = new BotWellnessDecisioner(enRouteLootingDecisioner, combatEngagementDecisioner);
 
-        this.decisioner = botWellnessDecisioner;
+        this.decisioner = new BotWellnessDecisioner(enRouteLootingDecisioner, combatEngagementDecisioner);
 
     }
 

@@ -1,19 +1,21 @@
 package com.brianstempin.vindiniumclient.bot.advanced;
 
-import com.brianstempin.vindiniumclient.Main;
 import com.brianstempin.vindiniumclient.bot.BotMove;
-import com.brianstempin.vindiniumclient.bot.advanced.murderbot.AdvancedMurderBot;
 import com.brianstempin.vindiniumclient.dto.ApiKey;
 import com.brianstempin.vindiniumclient.dto.GameState;
 import com.brianstempin.vindiniumclient.dto.Move;
-import com.google.api.client.http.*;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpContent;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.UrlEncodedContent;
 import com.google.api.client.http.apache.ApacheHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.gson.Gson;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,11 +36,13 @@ public class AdvancedBotRunner implements Callable<GameState> {
     private final ApiKey apiKey;
     private final GenericUrl gameUrl;
     private final AdvancedBot bot;
+    private boolean isFinished;
 
     public AdvancedBotRunner(ApiKey apiKey, GenericUrl gameUrl, AdvancedBot bot) {
         this.apiKey = apiKey;
         this.gameUrl = gameUrl;
         this.bot = bot;
+        isFinished = true;
     }
 
     @Override
@@ -90,5 +94,13 @@ public class AdvancedBotRunner implements Callable<GameState> {
 
         logger.info("Game over");
         return gameState;
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
     }
 }
