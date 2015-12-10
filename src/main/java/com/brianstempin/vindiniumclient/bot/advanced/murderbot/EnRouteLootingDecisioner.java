@@ -37,7 +37,7 @@ public class EnRouteLootingDecisioner implements Decision<AdvancedMurderBot.Game
         for(Vertex currentVertex : boardGraph.get(myPosition).getAdjacentVertices()) {
             Mine mine = context.getGameState().getMines().get(currentVertex.getPosition());
             if(mine != null && (mine.getOwner() == null
-                    || mine.getOwner().getId() != context.getGameState().getMe().getId())) {
+                    || mine.getOwner().getName() != context.getGameState().getMe().getName())) {
 
                 // Is it safe to take?
                 if(BotUtils.getHeroesAround(context.getGameState(), context.getDijkstraResultMap(), 1).size() > 0) {
