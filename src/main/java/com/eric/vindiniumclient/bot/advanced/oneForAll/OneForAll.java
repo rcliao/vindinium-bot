@@ -185,10 +185,8 @@ public class OneForAll implements AdvancedBot {
 
         if (!gameState.getPubs().containsKey(max)) {
             lastPositions.add(max);
-
-            if (gameState.getMe().getLife() > 60) {
-                return BotMove.STAY;
-            }
+        } else if (gameState.getMe().getLife() > 60) {
+			return BotMove.STAY;
         }
 
         return BotUtils.directionTowards(gameState.getMe().getPos(), max);
