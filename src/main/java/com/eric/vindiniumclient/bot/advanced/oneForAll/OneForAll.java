@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class OneForAll implements AdvancedBot {
-    private final Double FACTOR = 3.0;
-    private final Double BASE_VALUE = 100000.0;
+    private final Double FACTOR = 2.0;
+    private final Double BASE_VALUE = 1000.0;
     private final Map<Mine, Double> mineAccum = Maps.newHashMap();
     private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(2);
 
@@ -31,6 +31,23 @@ public class OneForAll implements AdvancedBot {
         Stopwatch watch = Stopwatch.createStarted();
 
         Map<GameState.Position, Double> valueMap = Maps.newHashMap();
+
+        // if the mine is contested, reset the accumulator
+        mineAccum.keySet()
+            .stream()
+            .forEach(oldMine -> {
+                gameState.getMines()
+                    .values()
+                    .stream()
+                    .forEach(newMine -> {
+                        if (newMine.getPosition().equals(oldMine.getPosition()) &&
+                            oldMine.getOwner() != null &&
+                            newMine.getOwner() != null &&
+                            newMine.getOwner().getId() != oldMine.getOwner().getId()) {
+                            mineAccum.put(oldMine, 0.9);
+                        }
+                    });
+            });
 
         lastPositions.stream()
             .forEach(pos -> valueMap.put(pos, -BASE_VALUE));
@@ -76,7 +93,9 @@ public class OneForAll implements AdvancedBot {
             .filter(hero -> !hero.getName().equals(gameState.getMe().getName()))
             .forEach(hero -> {
                 // do not stand on the spawn point to avoid random death
-                valueMap.put(hero.getSpawnPos(), -Double.MAX_VALUE);
+                if (hero.getLife() < 30) {
+                    valueMap.put(hero.getSpawnPos(), -Double.MAX_VALUE);
+                }
 
                 Vertex v = gameState.getBoardGraph().get(hero.getPos());
                 boolean winnable = gameState.getMe().getLife() > 30 &&
@@ -87,10 +106,22 @@ public class OneForAll implements AdvancedBot {
                     BASE_VALUE * hero.getMineCount() * ((gameState.getMe().getLife() - hero.getLife()) / 20.0) :
                     BASE_VALUE * -1.0 * gameState.getMe().getMineCount() * ((hero.getLife() - gameState.getMe().getLife()) / 20.0);
 
-                diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 5);
+                diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 6);
+            });
+
+        gameState.getHeroesByPosition()
+            .values()
+            .stream()
+            .filter(hero -> hero.getName().equals(gameState.getMe().getName()) && hero.getId() != gameState.getMe().getId())
+            .forEach(hero -> {
+                Vertex v = gameState.getBoardGraph().get(hero.getPos());
+
+                diffuseMap(gameState, valueMap, Sets.newHashSet(), v, -BASE_VALUE, 2);
             });
 
         logger.info("OneForAll bot diffused hero values " + watch.elapsed(TimeUnit.MILLISECONDS));
+
+        printValueMap(valueMap, gameState.getGameState().getGame().getBoard().getSize(), gameState.getMe().getPos());
 
         return findBestNextPath(gameState, valueMap);
     }
