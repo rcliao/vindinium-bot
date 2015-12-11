@@ -101,8 +101,8 @@ public class OneForAll implements AdvancedBot {
                     hero.getLife() / 15 > getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
 
                 double value = (winnable) ?
-                    BASE_VALUE * hero.getMineCount() * ((gameState.getMe().getLife() - hero.getLife()) / 20.0) :
-                    BASE_VALUE * -1.0 * gameState.getMe().getMineCount() * ((hero.getLife() - gameState.getMe().getLife()) / 20.0);
+                    BASE_VALUE * hero.getMineCount() * (hero.getLife() / 20.0) :
+                    BASE_VALUE * -1.0 * gameState.getMe().getMineCount() * (gameState.getMe().getLife() / 20.0);
 
                 diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 6);
             });
