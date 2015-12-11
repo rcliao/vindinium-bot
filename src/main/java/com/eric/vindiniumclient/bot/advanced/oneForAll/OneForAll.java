@@ -20,6 +20,7 @@ public class OneForAll implements AdvancedBot {
     private final Double FACTOR = 2.0;
     private final Double BASE_VALUE = 1000.0;
     private final Map<Mine, Double> mineAccum = Maps.newHashMap();
+    private final Map<Pub, Double> pubAccum = Maps.newHashMap();
     private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(2);
 
     private static final Logger logger = LogManager.getLogger(OneForAll.class);
@@ -29,6 +30,14 @@ public class OneForAll implements AdvancedBot {
         Stopwatch watch = Stopwatch.createStarted();
 
         Map<GameState.Position, Double> valueMap = Maps.newHashMap();
+
+        if (gameState.getMe().getLife() < 60) {
+            pubAccum.keySet()
+                .stream()
+                .forEach(pub -> {
+					pubAccum.put(pub, 0.9);
+                });
+        }
 
         // if the mine is contested, reset the accumulator
         mineAccum.keySet()
@@ -77,7 +86,7 @@ public class OneForAll implements AdvancedBot {
                         (
                             (60.0 - gameState.getMe().getLife() > 0.0) ?
                                 ((100.0 - gameState.getMe().getLife()) / 100.0) :
-                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 3))
+                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.5))
                         );
                 diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 30);
             });
