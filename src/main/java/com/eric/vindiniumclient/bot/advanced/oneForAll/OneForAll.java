@@ -168,14 +168,16 @@ public class OneForAll implements AdvancedBot {
         double maxValue = -Double.MAX_VALUE;
         GameState.Position max = gameState.getMe().getPos();
 
-            for (Vertex neighbor: vertex.getAdjacentVertices()) {
-                GameState.Position pos = neighbor.getPosition();
-                double value = valueMap.getOrDefault(pos, 0.0);
-                if (value > maxValue) {
-                    maxValue = value;
-                    max = pos;
-                }
-            }
+		for (Vertex neighbor: vertex.getAdjacentVertices()) {
+			GameState.Position pos = neighbor.getPosition();
+			double value = valueMap.getOrDefault(pos, 0.0);
+			if (value > maxValue) {
+				maxValue = value;
+				max = pos;
+			}
+		}
+
+        logger.info("Find biggest neighbor " + max + " with value " + maxValue);
 
         if (gameState.getMines().containsKey(max)) {
             mineAccum.put(gameState.getMines().get(max), 0.0);
@@ -183,9 +185,12 @@ public class OneForAll implements AdvancedBot {
 
         if (!gameState.getPubs().containsKey(max)) {
             lastPositions.add(max);
+
+            if (gameState.getMe().getLife() > 60) {
+                return BotMove.STAY;
+            }
         }
 
-        logger.info("Find biggest neighbor " + max + " with value " + maxValue);
         return BotUtils.directionTowards(gameState.getMe().getPos(), max);
     }
 
