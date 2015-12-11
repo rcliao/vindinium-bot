@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class OneForAll implements AdvancedBot {
-    private final Double FACTOR = 2.1;
-    private final Double BASE_VALUE = 10000.0;
+    private final Double FACTOR = 3.0;
+    private final Double BASE_VALUE = 100000.0;
     private final Map<Mine, Double> mineAccum = Maps.newHashMap();
     private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(2);
 
