@@ -177,9 +177,9 @@ public class OneForAll implements AdvancedBot {
                 }
             }
 
-        if (gameState.getMines().get(max) != null) {
+        if (gameState.getMines().containsKey(max)) {
             mineAccum.put(gameState.getMines().get(max), 0.0);
-        } else {
+        } else if (gameState.getPubs().containsKey(max)) {
             lastPositions.add(max);
         }
 
