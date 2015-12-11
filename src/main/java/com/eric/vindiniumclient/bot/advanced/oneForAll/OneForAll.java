@@ -85,8 +85,8 @@ public class OneForAll implements AdvancedBot {
                     BASE_VALUE * gameState.getMe().getMineCount() *
                         (
                             (60.0 - gameState.getMe().getLife() > 0.0) ?
-                                ((100.0 - gameState.getMe().getLife()) / 100.0) :
-                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.5))
+                                ((60 - gameState.getMe().getLife()) / 100.0) :
+                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.3))
                         );
                 diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 30);
             });
