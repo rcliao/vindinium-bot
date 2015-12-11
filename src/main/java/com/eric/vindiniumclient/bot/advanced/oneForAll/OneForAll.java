@@ -105,8 +105,7 @@ public class OneForAll implements AdvancedBot {
                 }
 
                 Vertex v = gameState.getBoardGraph().get(hero.getPos());
-                boolean winnable = gameState.getMe().getLife() > 20 &&
-                    hero.getLife() < gameState.getMe().getLife() &&
+                boolean winnable = hero.getLife() < gameState.getMe().getLife() &&
                     hero.getLife() / 20 < getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
 
                 double value = (winnable) ?
