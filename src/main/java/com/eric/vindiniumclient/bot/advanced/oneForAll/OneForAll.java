@@ -2,13 +2,11 @@ package com.eric.vindiniumclient.bot.advanced.oneForAll;
 
 import com.eric.vindiniumclient.bot.BotMove;
 import com.eric.vindiniumclient.bot.BotUtils;
-import com.eric.vindiniumclient.bot.advanced.AdvancedBot;
-import com.eric.vindiniumclient.bot.advanced.AdvancedGameState;
-import com.eric.vindiniumclient.bot.advanced.Mine;
-import com.eric.vindiniumclient.bot.advanced.Vertex;
+import com.eric.vindiniumclient.bot.advanced.*;
 import com.eric.vindiniumclient.dto.GameState;
 import com.google.api.client.util.Maps;
 import com.google.api.client.util.Sets;
+import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.EvictingQueue;
 import org.apache.logging.log4j.LogManager;
@@ -77,7 +75,7 @@ public class OneForAll implements AdvancedBot {
                 Double value =
                     BASE_VALUE * gameState.getMe().getMineCount() *
                         (
-                            (70.0 - gameState.getMe().getLife() > 0.0) ?
+                            (60.0 - gameState.getMe().getLife() > 0.0) ?
                                 ((100.0 - gameState.getMe().getLife()) / 100.0) :
                                 0.0
                         );
@@ -99,8 +97,8 @@ public class OneForAll implements AdvancedBot {
 
                 Vertex v = gameState.getBoardGraph().get(hero.getPos());
                 boolean winnable = gameState.getMe().getLife() > 30 &&
-                    hero.getLife() + 10 < gameState.getMe().getLife();
-                // TODO: may need to take care of the tavern distance later
+                    hero.getLife() + 10 < gameState.getMe().getLife() &&
+                    hero.getLife() / 15 > getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
 
                 double value = (winnable) ?
                     BASE_VALUE * hero.getMineCount() * ((gameState.getMe().getLife() - hero.getLife()) / 20.0) :
@@ -125,6 +123,28 @@ public class OneForAll implements AdvancedBot {
 
         return findBestNextPath(gameState, valueMap);
     }
+
+    private double getDistance(GameState.Position pos, GameState.Position closetTavern) {
+        // TODO: maybe replace with BFS or Astar to find path and cost
+        return Math.sqrt(Math.pow(pos.getX() - closetTavern.getX(), 2) + Math.pow(pos.getY() - closetTavern.getY(), 2));
+    }
+
+    private Optional<GameState.Position> getClosetTavern(AdvancedGameState gameState, GameState.Hero hero) {
+        double value = Double.MIN_VALUE;
+        Optional<GameState.Position> result = Optional.absent();
+
+        for (Pub tavern: gameState.getPubs().values()) {
+            double temp = getDistance(tavern.getPosition(), hero.getPos());
+            if (value < temp) {
+                value = temp;
+                result = Optional.of(tavern.getPosition());
+            }
+        }
+
+        return result;
+    }
+
+
 
     private void printValueMap(Map<GameState.Position, Double> valueMap, int size, GameState.Position me) {
         for (int i = 0; i < size; i ++) {
