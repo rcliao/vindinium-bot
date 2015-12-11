@@ -86,7 +86,7 @@ public class OneForAll implements AdvancedBot {
                         (
                             (60.0 - gameState.getMe().getLife() > 0.0) ?
                                 ((100.0 - gameState.getMe().getLife()) / 100.0) :
-                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.5) * (100.0 - gameState.getMe().getLife()) / 100.0)
+                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.5))
                         );
                 diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 30);
             });
@@ -123,7 +123,7 @@ public class OneForAll implements AdvancedBot {
             .forEach(hero -> {
                 Vertex v = gameState.getBoardGraph().get(hero.getPos());
 
-                diffuseMap(gameState, valueMap, Sets.newHashSet(), v, -BASE_VALUE, 2);
+                diffuseMap(gameState, valueMap, Sets.newHashSet(), v, -BASE_VALUE * 2, 1);
             });
 
         logger.info("OneForAll bot diffused hero values " + watch.elapsed(TimeUnit.MILLISECONDS));

@@ -1,6 +1,7 @@
 package com.eric.vindiniumclient.bot;
 
 import com.eric.vindiniumclient.bot.advanced.AdvancedGameState;
+import com.eric.vindiniumclient.bot.advanced.Vertex;
 import com.eric.vindiniumclient.bot.advanced.murderbot.AdvancedMurderBot;
 import com.eric.vindiniumclient.dto.GameState;
 
