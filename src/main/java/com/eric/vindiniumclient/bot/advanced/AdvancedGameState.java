@@ -14,12 +14,14 @@ public class AdvancedGameState {
     private final Map<Integer, GameState.Hero> heroesById;
     private final Map<GameState.Position, Vertex> boardGraph;
     private final GameState.Hero me;
+    private GameState gameState;
 
     /**
      * Creates an AdvancedGameState from a GameState
      * @param gameState
      */
     public AdvancedGameState(GameState gameState) {
+        this.gameState = gameState;
         boardGraph = new HashMap<>();
         mines = new HashMap<>();
         pubs = new HashMap<>();
@@ -74,15 +76,6 @@ public class AdvancedGameState {
         // Add in the edges
         // This graph doesn't take into account players because they move.  That is done elsewhere.
         for (Vertex currentVertex : this.boardGraph.values()) {
-            GameState.Position currentVertexPosition = currentVertex.getPosition();
-
-            // Pubs and mines cannot be passed through
-            if(this.mines.containsKey(currentVertexPosition) || this.pubs.containsKey(currentVertexPosition))
-                continue;
-
-            // Other players cannot be passed through.  However, they move, and mines/pubs don't, so its easier to make
-            // the bot and path-finding deal with that.  We don't take other players into account here.
-
             // We can only move NSEW, so no need for a fancy set of nested loops...
             for (int xDelta = -1; xDelta <= 1; xDelta += 2) {
                 int currentX = currentVertex.getPosition().getX();
@@ -113,6 +106,7 @@ public class AdvancedGameState {
      * @param updatedState
      */
     public AdvancedGameState(AdvancedGameState oldGameState, GameState updatedState) {
+        this.gameState = updatedState;
 
         // Copy the stuff we can just re-use
         this.boardGraph = oldGameState.getBoardGraph();
@@ -181,5 +175,13 @@ public class AdvancedGameState {
 
     public GameState.Hero getMe() {
         return me;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 }

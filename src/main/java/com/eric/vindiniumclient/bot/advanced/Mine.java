@@ -25,4 +25,31 @@ public class Mine {
     }
 
     public void setOwner(GameState.Hero hero) { this.owner = hero; }
+
+    @Override
+    public String toString() {
+        return "Mine{" +
+            "position=" + position +
+            ", owner=" + owner +
+            '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Mine)) return false;
+
+        Mine mine = (Mine) o;
+
+        if (!getPosition().equals(mine.getPosition())) return false;
+        return !(getOwner() != null ? !getOwner().equals(mine.getOwner()) : mine.getOwner() != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getPosition().hashCode();
+        result = 31 * result + (getOwner() != null ? getOwner().hashCode() : 0);
+        return result;
+    }
 }
