@@ -20,7 +20,6 @@ public class OneForAll implements AdvancedBot {
     private final Double FACTOR = 2.0;
     private final Double BASE_VALUE = 1000.0;
     private final Map<Mine, Double> mineAccum = Maps.newHashMap();
-    private final Map<Pub, Double> pubAccum = Maps.newHashMap();
     private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(2);
 
     private static final Logger logger = LogManager.getLogger(OneForAll.class);
@@ -30,14 +29,6 @@ public class OneForAll implements AdvancedBot {
         Stopwatch watch = Stopwatch.createStarted();
 
         Map<GameState.Position, Double> valueMap = Maps.newHashMap();
-
-        if (gameState.getMe().getLife() < 60) {
-            pubAccum.keySet()
-                .stream()
-                .forEach(pub -> {
-					pubAccum.put(pub, 0.9);
-                });
-        }
 
         // if the mine is contested, reset the accumulator
         mineAccum.keySet()
@@ -85,8 +76,8 @@ public class OneForAll implements AdvancedBot {
                     BASE_VALUE * gameState.getMe().getMineCount() *
                         (
                             (60.0 - gameState.getMe().getLife() > 0.0) ?
-                                ((60 - gameState.getMe().getLife()) / 100.0) :
-                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.3)) * 0.6
+                                ((70 - gameState.getMe().getLife()) / 100.0) :
+                                (gameState.getMe().getMineCount() / (gameState.getMines().size() / 1.3))
                         );
                 diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 30);
             });
@@ -106,7 +97,7 @@ public class OneForAll implements AdvancedBot {
 
                 Vertex v = gameState.getBoardGraph().get(hero.getPos());
                 boolean winnable = hero.getLife() < gameState.getMe().getLife() &&
-                    hero.getLife() / 20 < getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
+                    hero.getLife() / 20.0 < getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
 
                 double value = (winnable) ?
                     BASE_VALUE * hero.getMineCount() * (hero.getLife() / 20.0) :
@@ -188,9 +179,10 @@ public class OneForAll implements AdvancedBot {
 
         if (gameState.getMines().get(max) != null) {
             mineAccum.put(gameState.getMines().get(max), 0.0);
+        } else {
+            lastPositions.add(max);
         }
 
-        lastPositions.add(max);
         logger.info("Find biggest neighbor " + max + " with value " + maxValue);
         return BotUtils.directionTowards(gameState.getMe().getPos(), max);
     }
