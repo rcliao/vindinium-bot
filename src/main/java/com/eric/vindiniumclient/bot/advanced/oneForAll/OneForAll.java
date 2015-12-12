@@ -20,7 +20,7 @@ public class OneForAll implements AdvancedBot {
     private final Double FACTOR = 2.0;
     private final Double BASE_VALUE = 1000.0;
     private final Map<Mine, Double> mineAccum = Maps.newHashMap();
-    private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(2);
+    private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(3);
 
     private static final Logger logger = LogManager.getLogger(OneForAll.class);
 
@@ -172,7 +172,9 @@ public class OneForAll implements AdvancedBot {
         double maxValue = -Double.MAX_VALUE;
         GameState.Position max = gameState.getMe().getPos();
 
-        lastPositions.poll();
+        if (lastPositions.size() == 3) {
+            lastPositions.poll();
+        }
 
 		for (Vertex neighbor: vertex.getAdjacentVertices()) {
 			GameState.Position pos = neighbor.getPosition();
