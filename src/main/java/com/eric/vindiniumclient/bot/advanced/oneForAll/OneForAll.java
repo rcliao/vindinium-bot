@@ -172,6 +172,8 @@ public class OneForAll implements AdvancedBot {
         double maxValue = -Double.MAX_VALUE;
         GameState.Position max = gameState.getMe().getPos();
 
+        lastPositions.poll();
+
 		for (Vertex neighbor: vertex.getAdjacentVertices()) {
 			GameState.Position pos = neighbor.getPosition();
 			double value = valueMap.getOrDefault(pos, 0.0);
