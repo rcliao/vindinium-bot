@@ -41,7 +41,11 @@ public class OneForAll implements AdvancedBot {
                         if (newMine.getPosition().equals(oldMine.getPosition()) &&
                             oldMine.getOwner() != null &&
                             newMine.getOwner() != null &&
-                            newMine.getOwner().getId() != oldMine.getOwner().getId()) {
+                            newMine.getOwner().getId() != oldMine.getOwner().getId() &&
+                            !(
+								newMine.getOwner().getLife() == 100 &&
+								newMine.getOwner().getPos().equals(newMine.getOwner().getSpawnPos())
+                            )) {
                             mineAccum.put(oldMine, 0.9);
                         }
                     });
@@ -100,7 +104,7 @@ public class OneForAll implements AdvancedBot {
                     hero.getLife() / 20.0 < getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
 
                 double value = (winnable) ?
-                    BASE_VALUE * hero.getMineCount() * (hero.getLife() / 20.0) :
+                    BASE_VALUE * hero.getMineCount() * ((100.0 - hero.getLife()) / 20.0) :
                     BASE_VALUE * -1.0 * gameState.getMe().getMineCount() * (gameState.getMe().getLife() / 20.0);
 
                 diffuseMap(gameState, valueMap, Sets.newHashSet(), v, value, 6);
@@ -184,6 +188,9 @@ public class OneForAll implements AdvancedBot {
         }
 
         if (!gameState.getPubs().containsKey(max)) {
+            if (!lastPositions.contains(max)) {
+                lastPositions.clear();
+            }
             lastPositions.add(max);
         } else if (gameState.getMe().getLife() > 60) {
 			return BotMove.STAY;
