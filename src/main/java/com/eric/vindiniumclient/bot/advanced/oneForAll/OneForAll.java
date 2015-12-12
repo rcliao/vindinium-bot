@@ -32,20 +32,11 @@ public class OneForAll implements AdvancedBot {
 
         Map<GameState.Position, Double> valueMap = Maps.newHashMap();
 
-        mineAccum.keySet()
-            .stream()
-            .filter(oldMine -> gameState.getMines().containsValue(oldMine) &&
-                oldMine.getOwner() != null &&
-                oldMine.getOwner().getLife() == 100 &&
-                oldMine.getOwner().getPos().equals(oldMine.getOwner().getSpawnPos()))
-            .forEach(contestedMine -> {
-                mineAccum.put(contestedMine, 0.9);
-            });
-
+        // get other teammate's path, walk the other route
         gameState.getHeroesById()
             .values()
             .stream()
-            .filter(hero -> hero.getName().equals(gameState.getMe().getName()) && hero.getId() != gameState.getMe().getId())
+            .filter(hero -> hero.getName().equals(gameState.getMe().getName()))
             .forEach(hero -> {
                 if (teammateTraces.get(hero) == null) {
                     teammateTraces.put(hero, EvictingQueue.create(2));
@@ -63,7 +54,7 @@ public class OneForAll implements AdvancedBot {
             });
 
         lastPositions.stream()
-            .forEach(pos -> valueMap.put(pos, -BASE_VALUE * 0.5));
+            .forEach(pos -> valueMap.put(pos, -BASE_VALUE));
 
         logger.info("OneForAll bot started");
 
