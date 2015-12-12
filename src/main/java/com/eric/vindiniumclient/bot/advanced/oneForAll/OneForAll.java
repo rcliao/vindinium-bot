@@ -21,8 +21,6 @@ public class OneForAll implements AdvancedBot {
     private final Double BASE_VALUE = 1000.0;
     private final Map<Mine, Double> mineAccum = Maps.newHashMap();
     private EvictingQueue<GameState.Position> lastPositions = EvictingQueue.create(2);
-    private final Map<GameState.Hero, EvictingQueue<GameState.Position>> teammateTraces
-        = Maps.newHashMap();
 
     private static final Logger logger = LogManager.getLogger(OneForAll.class);
 
@@ -31,27 +29,6 @@ public class OneForAll implements AdvancedBot {
         Stopwatch watch = Stopwatch.createStarted();
 
         Map<GameState.Position, Double> valueMap = Maps.newHashMap();
-
-        // get other teammate's path, walk the other route
-        gameState.getHeroesById()
-            .values()
-            .stream()
-            .filter(hero -> hero.getName().equals(gameState.getMe().getName()))
-            .forEach(hero -> {
-                if (teammateTraces.get(hero) == null) {
-                    teammateTraces.put(hero, EvictingQueue.create(2));
-                }
-
-                teammateTraces.get(hero).add(hero.getPos());
-            });
-
-        teammateTraces.values()
-            .stream()
-            .forEach(pastTrace -> {
-                pastTrace
-                    .stream()
-                    .forEach(pos -> valueMap.put(pos, -BASE_VALUE * 0.5));
-            });
 
         // if the mine is contested, reset the accumulator
         mineAccum.keySet()
@@ -120,7 +97,7 @@ public class OneForAll implements AdvancedBot {
 
                 Vertex v = gameState.getBoardGraph().get(hero.getPos());
                 boolean winnable = hero.getLife() < gameState.getMe().getLife() &&
-                    hero.getLife() / 20.0 < getDistance(hero.getPos(), getClosetTavern(gameState, hero).get()) + 1.0;
+                    hero.getLife() / 20.0 < getDistance(hero.getPos(), getClosetTavern(gameState, hero).get());
 
                 double value = (winnable) ?
                     BASE_VALUE * hero.getMineCount() * (hero.getLife() / 20.0) :
