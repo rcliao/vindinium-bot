@@ -53,6 +53,23 @@ public class OneForAll implements AdvancedBot {
                     .forEach(pos -> valueMap.put(pos, -BASE_VALUE * 0.5));
             });
 
+        // if the mine is contested, reset the accumulator
+        mineAccum.keySet()
+            .stream()
+            .forEach(oldMine -> {
+                gameState.getMines()
+                    .values()
+                    .stream()
+                    .forEach(newMine -> {
+                        if (newMine.getPosition().equals(oldMine.getPosition()) &&
+                            oldMine.getOwner() != null &&
+                            newMine.getOwner() != null &&
+                            newMine.getOwner().getId() != oldMine.getOwner().getId()) {
+                            mineAccum.put(oldMine, 0.9);
+                        }
+                    });
+            });
+
         lastPositions.stream()
             .forEach(pos -> valueMap.put(pos, -BASE_VALUE));
 
