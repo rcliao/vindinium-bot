@@ -206,7 +206,8 @@ public class OneForAll implements AdvancedBot {
             mineAccum.put(gameState.getMines().get(max), 0.0);
         }
 
-        if (!gameState.getPubs().containsKey(max)) {
+        if (!gameState.getPubs().containsKey(max) &&
+            !lastPositions.contains(max)) {
             lastPositions.add(max);
         } else if (gameState.getMe().getLife() > 60) {
 			return BotMove.STAY;
